@@ -5,9 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import yuzhou.gits.graph.DefaultBoundsGraph.BoundsGraphChangedEvent;
 import yuzhou.gits.graph.DefaultBoundsGraph.BoundsGraphChangedEventListener;
 
@@ -16,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class DefaultGraphPaper<C, Dim, B, G> implements GraphPaper<C, Dim, B, G>, BoundsGraphChangedEventListener<C,B,G> {
-	static Logger logger = LoggerFactory.getLogger(DefaultGraphPaper.class);
 	BoundsManager<Dim, B> boundsManager;
 	Map<B, DefaultBoundsGraph<C, B, G>> boundsGraphs = new HashMap<>();
 	DefaultBoundsGraph<C,B,G> root = new DefaultBoundsGraph<C,B,G>();
@@ -54,9 +50,6 @@ public class DefaultGraphPaper<C, Dim, B, G> implements GraphPaper<C, Dim, B, G>
 			List<B> dirtyBoundsList = this.boundsManager.layout(this.dim, this);
 			if(dirtyBoundsList == null) {
 				return;
-			}
-			if (logger.isDebugEnabled()) {
-				//this.printAllBoundsInfos();
 			}
 			// TODO recalculate all bounds dimension and recalculate all bounds
 			// graphs,repaint all bounds
