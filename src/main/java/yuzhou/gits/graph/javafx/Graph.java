@@ -9,6 +9,7 @@ public abstract class Graph<Observable> {
 	protected double bottomGap;
 	protected double leftGap;
 	protected double rightGap;
+	protected double xMinGap;
 	protected double xGap;
 	protected double yGap;
 	protected Canvas canvas;
@@ -23,7 +24,8 @@ public abstract class Graph<Observable> {
 		this.bottomGap = bottomGap;
 		this.leftGap = leftGap;
 		this.rightGap = rightGap;
-		this.xGap = xGap;
+		this.xMinGap = xGap;
+		this.xGap = xMinGap;
 		this.yGap = yGap;
 		this.canvas = canvas;
 		this.gCxt = canvas.getGraphicsContext2D();
@@ -38,7 +40,9 @@ public abstract class Graph<Observable> {
 	protected abstract void calYTickSize();
 	
 	protected Observable model;
-	
+	public Observable getModel() {
+		return this.model;
+	}
 	public void draw() {
 		this.calCoors();
 
