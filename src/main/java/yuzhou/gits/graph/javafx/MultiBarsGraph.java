@@ -3,18 +3,14 @@ package yuzhou.gits.graph.javafx;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.stage.PopupWindow.AnchorLocation;
 
-public class MultiBarsGraph<M, T extends ObservableList<M>> extends Graph<T> {
+public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 	protected Color[][] barColors;
 	int currIdx=-1;
 	String tipMsg = null;
@@ -27,13 +23,44 @@ public class MultiBarsGraph<M, T extends ObservableList<M>> extends Graph<T> {
 		this.showTip = showTip;
 		this.tipMsgFun = tipMsgFun;
 		this.colorFun = colorFun;
+		
+		if(showTip) {
+			Platform.runLater(()->{
+				final Tooltip tooltip = new Tooltip();
+				tooltip.setAutoHide(true);
+				this.canvas.setOnMouseExited(e->{
+					tooltip.hide();
+				});
+				tooltip.setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
+				this.canvas.setOnMouseMoved(e->{
+					if(this.model == null || this.model.size()==0)return;
+					int idx = (int) Math.floor((e.getX()-this.leftGap)/(this.xTickSize+this.xMinGap));
+					if(idx>=this.model.size()) {
+						idx = -1;
+					}else if(idx<0) {
+						idx=0;
+					}
+					if(currIdx != idx) {
+						currIdx = idx;
+						tipMsg = tipMsgFun.apply(idx,this.model);
+						tooltip.setText(tipMsg);
+					}
+					//canvas.localToScreen(new Point2D(e.getX(), e.getY()));
+					if(tipMsg!=null) {
+						tooltip.show(canvas, e.getScreenX()+10, e.getScreenY()+10);
+					}else {
+						tooltip.hide();
+					}
+				});
+			});
+		}
 	}
 
 	protected double maxBarYVal = -Double.MIN_VALUE;
 	protected double minBarYVal = 0;
 	protected double maxLineYVal = -Double.MIN_VALUE;
 	protected double minLineYVal = Double.MAX_VALUE;
-
+	
 	protected void sort() {
 		for (int j = 0; j < this.model.size(); j++) {
 			M item = model.get(j);
@@ -66,50 +93,23 @@ public class MultiBarsGraph<M, T extends ObservableList<M>> extends Graph<T> {
 	int lines;
 	public void setModel(T model, PropertyGetter<Double, M> xGetter, List<PropertyGetter<Double, M>> barGetters,List<PropertyGetter<Double,M>> lineGetters) {
 		this.model = model;
-		if(showTip) {
-			Platform.runLater(()->{
-				final Tooltip tooltip = new Tooltip();
-				tooltip.setAutoHide(true);
-				this.canvas.setOnMouseExited(e->{
-					tooltip.hide();
-				});
-				tooltip.setAnchorLocation(AnchorLocation.WINDOW_TOP_LEFT);
-				this.canvas.setOnMouseMoved(e->{
-					int idx = (int) Math.floor((e.getX()-this.leftGap)/(this.xTickSize+this.xMinGap));
-					if(idx>=this.model.size()) {
-						idx = -1;
-					}else if(idx<0) {
-						idx=0;
-					}
-					if(currIdx != idx) {
-						currIdx = idx;
-						tipMsg = tipMsgFun.apply(idx,this.model);
-						tooltip.setText(tipMsg);
-					}
-					//canvas.localToScreen(new Point2D(e.getX(), e.getY()));
-					if(tipMsg!=null) {
-						tooltip.show(canvas, e.getScreenX()+10, e.getScreenY()+10);
-					}else {
-						tooltip.hide();
-					}
-				});
-			});
-		}
+		
 		this.xGetter = xGetter;
 		this.barGetters = barGetters == null ? new ArrayList<>() : barGetters;
 		this.lineGetters = lineGetters == null ? new ArrayList<>() : lineGetters;
 		bars = this.barGetters.size();
 		lines = this.lineGetters.size();
-		this.model.addListener(new ListChangeListener<M>() {
-			@Override
-			public void onChanged(Change<? extends M> c) {
-				MultiBarsGraph.this.sort();
-				MultiBarsGraph.this.calXTickSize();
-				MultiBarsGraph.this.calYTickSize();
-				MultiBarsGraph.this.draw();
-			}
-		});
+//		this.model.addListener(new ListChangeListener<M>() {
+//			@Override
+//			public void onChanged(Change<? extends M> c) {
+//				MultiBarsGraph.this.sort();
+//				MultiBarsGraph.this.calXTickSize();
+//				MultiBarsGraph.this.calYTickSize();
+//				MultiBarsGraph.this.draw();
+//			}
+//		});
 		if(this.model.size()>0) {
+			reset();
 			this.sort();
 			this.calXTickSize();
 			this.calYTickSize();
@@ -262,16 +262,12 @@ public class MultiBarsGraph<M, T extends ObservableList<M>> extends Graph<T> {
 		this.xLineCoors = null;
 		this.yLineCoors = null;
 	}
-	
-	public void bindYGetters(List<PropertyGetter<Double,M>> barGetters,List<PropertyGetter<Double,M>> lineGetters,BiFunction<Integer,List<M>,String> tipMsgFun,
-			Color[][] barColors,BiFunction<PropertyGetter<Double,M>,M,Integer> colorFun) {
+	void reset() {
 		this.gCxt.clearRect(0, 0,w,h);
 		maxBarYVal = -Double.MIN_VALUE;
 		minBarYVal = 0;
 		maxLineYVal = -Double.MIN_VALUE;
 		minLineYVal = Double.MAX_VALUE;
-		this.barColors = barColors;
-		this.colorFun = colorFun;
 		this.maxBarRange = 0;
 		this.maxLineRange = 0;
 		this.xBaseCoors = null;
@@ -284,8 +280,23 @@ public class MultiBarsGraph<M, T extends ObservableList<M>> extends Graph<T> {
 		this.bars=this.barGetters.size();
 		this.lines=this.lineGetters.size();
 		tipMsg=null;
-		this.tipMsgFun = tipMsgFun;
 		this.currIdx=-1;
+	}
+	public void bindYGetters(List<PropertyGetter<Double,M>> barGetters,List<PropertyGetter<Double,M>> lineGetters,BiFunction<Integer,List<M>,String> tipMsgFun,
+			Color[][] barColors,BiFunction<PropertyGetter<Double,M>,M,Integer> colorFun) {
+		reset();
+		this.gCxt.clearRect(0, 0,w,h);
+		 
+		this.barColors = barColors;
+		this.colorFun = colorFun;
+		 
+		this.barGetters = barGetters == null?new ArrayList<>():barGetters;
+		this.lineGetters = lineGetters == null?new ArrayList<>():lineGetters;
+		this.bars=this.barGetters.size();
+		this.lines=this.lineGetters.size();
+		 
+		this.tipMsgFun = tipMsgFun;
+		 
 		this.sort();
 		this.calXTickSize();
 		this.calYTickSize();
