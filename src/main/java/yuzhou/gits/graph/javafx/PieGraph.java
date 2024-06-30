@@ -32,7 +32,7 @@ public class PieGraph<P extends Number,M,T extends Iterable<M>> extends Graph<T>
 			double percent = val/totalVals;
 			pieArcs[idx][0] = startAngles;
 			pieArcs[idx][1] = percent*360.0d;
-			System.out.println(pieArcs[idx][0]+","+pieArcs[idx][1]);
+			//System.out.println(pieArcs[idx][0]+","+pieArcs[idx][1]);
 			startAngles += pieArcs[idx][1];
 			colors[idx] = this.colorsFun.apply(item,idx);
 			idx++;

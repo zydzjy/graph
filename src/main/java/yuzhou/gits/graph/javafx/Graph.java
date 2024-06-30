@@ -36,14 +36,9 @@ public abstract class Graph<M> {
 	}
 	public void draw() {
 		this.calCoors();
-
-		if(Platform.isFxApplicationThread()) {
-			this._drawGraph();
-		}else {
-			Platform.runLater(()->{
+		Platform.runLater(()->{
 				this._drawGraph();
-			});
-		}
+		});
 	}
 	protected abstract void sort();
 	protected abstract void calCoors();
