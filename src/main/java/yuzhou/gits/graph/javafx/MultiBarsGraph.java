@@ -184,6 +184,7 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 		if(this.lines>0) {
 			this.gCxt.setLineWidth(5.0d);
 			for(int i=0;i<this.lines;i++) {
+				this.gCxt.setStroke(Color.GRAY);
 				this.gCxt.strokePolyline(xLineCoors, this.yLineCoors[i], this.model.size());
 			}
 		}
