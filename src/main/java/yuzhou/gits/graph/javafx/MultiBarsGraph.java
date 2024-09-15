@@ -199,8 +199,8 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 	BiFunction<PropertyGetter<Double,M>,M,Integer> colorFun;
 	@Override
 	protected void calCoors() {
-		if(this.bars==0) {
-			return;
+		if(this.bars==0 || this.model.size() == 0) {
+			return ;
 		}
 		this.xBaseCoors = new double[this.model.size()];
 		for (int i = 0; i < this.model.size(); i++) {

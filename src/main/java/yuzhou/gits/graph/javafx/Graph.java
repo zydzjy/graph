@@ -16,6 +16,7 @@ public abstract class Graph<M> {
 	protected double graphW;
 	protected double graphH;
 	protected GraphicsContext gCxt;
+
 	public Graph(double topGap, double bottomGap, double leftGap, double rightGap, Canvas canvas) {
 		super();
 		this.topGap = topGap;
@@ -26,22 +27,32 @@ public abstract class Graph<M> {
 		this.gCxt = canvas.getGraphicsContext2D();
 		this.w = canvas.getWidth();
 		this.h = canvas.getHeight();
-		this.graphW = w-leftGap-rightGap;
-		this.graphH = h-topGap-bottomGap;
+		this.graphW = w - leftGap - rightGap;
+		this.graphH = h - topGap - bottomGap;
 	}
-	
+
 	protected M model;
+
 	public M getModel() {
 		return this.model;
 	}
+
 	public void draw() {
 		this.calCoors();
-		Platform.runLater(()->{
+		Platform.runLater(() -> {
+			try {
 				this._drawGraph();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
 	}
+
 	protected abstract void sort();
+
 	protected abstract void calCoors();
+
 	protected abstract void _drawGraph();
+
 	public abstract void clear();
 }
