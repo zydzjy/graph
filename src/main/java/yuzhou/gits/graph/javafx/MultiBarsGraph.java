@@ -169,9 +169,6 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 
 	@Override
 	protected void _drawGraph() {
-		if(this.bars==0) {
-			return;
-		}
 		this.gCxt.clearRect(0, 0, w, h);
 		for (int i = 0; i < this.bars; i++) {
 			Color[] _barColors = this.barColors[i];
@@ -199,7 +196,7 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 	BiFunction<PropertyGetter<Double,M>,M,Integer> colorFun;
 	@Override
 	protected void calCoors() {
-		if(this.bars==0 || this.model.size() == 0) {
+		if(this.bars==0 || this.model == null ||  this.model.size() == 0) {
 			return ;
 		}
 		this.xBaseCoors = new double[this.model.size()];

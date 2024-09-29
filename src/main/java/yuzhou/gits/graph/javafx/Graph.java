@@ -38,7 +38,11 @@ public abstract class Graph<M> {
 	}
 
 	public void draw() {
-		this.calCoors();
+		try {
+			this.calCoors();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		Platform.runLater(() -> {
 			try {
 				this._drawGraph();
