@@ -13,8 +13,7 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.compilerVersion>17</maven.compiler.compilerVersion>
 		<java.version>17</java.version>
-		<javafx.version>22</javafx.version>
-		<javafx.plugin.version>0.0.8</javafx.plugin.version>
+		<javafx.version>22-ea+16</javafx.version>
 	</properties>
 
 	<dependencies>
