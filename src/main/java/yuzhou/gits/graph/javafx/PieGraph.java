@@ -62,7 +62,8 @@ public class PieGraph<P extends Number,M,T extends Iterable<M>> extends Graph<T>
 
 	@Override
 	public void clear() {
-		
+		this.gCxt.clearRect(0, 0,w,h);
+		this.model = null;
 	}
 	BiFunction<M,Integer,Color> colorsFun;
 	Color[] colors;

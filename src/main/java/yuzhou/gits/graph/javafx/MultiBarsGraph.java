@@ -16,6 +16,13 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 	String tipMsg = null;
 	boolean showTip=false;
 	BiFunction<Integer,List<M>,String> tipMsgFun;
+	boolean base0=false;
+	public MultiBarsGraph(boolean base0,double topGap, double bottomGap, double leftGap, double rightGap, double xGap, double yGap,
+			Canvas canvas, Color[][] barColors,boolean showTip,BiFunction<Integer,List<M>,String> tipMsgFun,BiFunction<PropertyGetter<Double,M>,M,Integer> colorFun) {
+		this(topGap,  bottomGap,  leftGap,  rightGap,  xGap,  yGap,
+			 canvas, barColors, showTip, tipMsgFun, colorFun);
+		this.base0 = base0;
+	}
 	public MultiBarsGraph(double topGap, double bottomGap, double leftGap, double rightGap, double xGap, double yGap,
 			Canvas canvas, Color[][] barColors,boolean showTip,BiFunction<Integer,List<M>,String> tipMsgFun,BiFunction<PropertyGetter<Double,M>,M,Integer> colorFun) {
 		super(topGap, bottomGap, leftGap, rightGap, xGap, yGap, canvas);
@@ -135,8 +142,12 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 		//maxBarRange = Math.max(Math.abs(this.maxBarYVal), this.minBarYVal) * 2;
 		yTickSize = (this.graphH) / (maxBarRange);
 		
-		maxLineRange = Math.max(Math.abs(this.maxLineYVal), this.minLineYVal) * 2;
-		maxLineRange = maxLineRange<200.0d?200.0d:maxLineRange;
+		if(!base0) {
+			maxLineRange = Math.max(Math.abs(this.maxLineYVal), this.minLineYVal) * 2;
+			maxLineRange = maxLineRange<200.0d?200.0d:maxLineRange;
+		}else {
+			maxLineRange = maxLineYVal;
+		}
 		this.yLineTickSize = (this.graphH) / (maxLineRange);
 	}
 
@@ -182,7 +193,7 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 			this.gCxt.setLineWidth(5.0d);
 			for(int i=0;i<this.lines;i++) {
 				this.gCxt.setStroke(Color.GRAY);
-				this.gCxt.strokePolyline(xLineCoors, this.yLineCoors[i], this.model.size());
+				this.gCxt.strokePolyline(xLineCoors,0, this.yLineCoors[i],0, this.model.size());
 			}
 		}
 	}
@@ -232,7 +243,7 @@ public class MultiBarsGraph<M, T extends List<M>> extends XYAxisGraph<T> {
 		}
 		
 		if(lines>0) {
-			this.maxLineYVal = this.maxLineRange /2.0d;
+			this.maxLineYVal = base0? this.maxLineRange : this.maxLineRange /2.0d;
 			this.yLineCoors = new double[this.lines][this.model.size()];
 			double zeroAxisLineY = (this.maxLineYVal*this.yLineTickSize);
 			for (int i = 0; i < this.lines; i++) {
